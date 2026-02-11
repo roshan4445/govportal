@@ -27,14 +27,14 @@ import {
 import { Send, User, MapPin, Phone, Mail } from 'lucide-react';
 
 const complaintSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  address: z.string().min(10, 'Please provide a complete address'),
-  contact: z.string().min(10, 'Please provide a valid contact number'),
-  email: z.string().email('Please provide a valid email address'),
-  title: z.string().min(5, 'Title must be at least 5 characters'),
-  description: z.string().min(20, 'Description must be at least 20 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  location: z.string().min(5, 'Please provide the incident location'),
+  Full_Name: z.string().min(2, 'Full name must be at least 2 characters'),
+  Address: z.string().min(10, 'Please provide a complete address'),
+  Contact_Number: z.string().min(10, 'Please provide a valid contact number'),
+  Email_Address: z.string().email('Please provide a valid email address'),
+  Complaint_Title: z.string().min(5, 'Title must be at least 5 characters'),
+  Detailed_Description: z.string().min(20, 'Description must be at least 20 characters'),
+  Category: z.string().min(1, 'Please select a category'),
+  Incident_Location: z.string().min(5, 'Please provide the incident location'),
 });
 
 type ComplaintFormData = z.infer<typeof complaintSchema>;
@@ -57,32 +57,100 @@ export function ComplaintForm() {
   const form = useForm<ComplaintFormData>({
     resolver: zodResolver(complaintSchema),
     defaultValues: {
-      fullName: '',
-      address: '',
-      contact: '',
-      email: '',
-      title: '',
-      description: '',
-      category: '',
-      location: '',
+      Full_Name: '',
+      Address: '',
+      Contact_Number: '',
+      Email_Address: '',
+      Complaint_Title: '',
+      Detailed_Description: '',
+      Category: '',
+      Incident_Location: '',
     },
   });
 
-  const onSubmit = async (data: ComplaintFormData) => {
-    setIsSubmitting(true);
+  // const onSubmit = async (data: ComplaintFormData) => {
+  //   setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  //   // Simulate API call
+  //   await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const complaintId = `CPL${Date.now().toString().slice(-6)}`;
+  //   const complaintId = `CPL${Date.now().toString().slice(-6)}`;
     
-    toast.success(`Complaint submitted successfully! Reference ID: ${complaintId}`, {
-      description: 'You will receive updates via email and SMS.',
+  //   toast.success(`Complaint submitted successfully! Reference ID: ${complaintId}`, {
+  //     description: 'You will receive updates via email and SMS.',
+  //   });
+    
+  //   form.reset();
+  //   setIsSubmitting(false);
+  // };
+//   const onSubmit = async (data: ComplaintFormData) => {
+//   setIsSubmitting(true);
+
+//   try {
+//     const response = await fetch('http://localhost:3000/complaint_user', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(data), // Use the same keys as in the form state
+//     });
+
+//     const result = await response.json();
+
+//     if (response.ok) {
+//       const complaintId = result.complaintId || `CPL${Date.now().toString().slice(-6)}`;
+//       toast.success(`Complaint submitted successfully! Reference ID: ${complaintId}`, {
+//         description: 'You will receive updates via Email and SMS.',
+//       });
+//       form.reset();
+//     } else {
+//       toast.error('Submission failed', {
+//         description: result.message || 'Something went wrong.',
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Submission Error:', error);
+//     toast.error('Network error occurred');
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+const onSubmit = async (data: ComplaintFormData) => {
+  setIsSubmitting(true);
+  // if needed
+
+  try {
+    const response = await fetch('http://localhost:3000/complaint_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...data// Optional if you're tracking by user
+      }),
     });
-    
-    form.reset();
+
+    const result = await response.json();
+
+    if (response.ok && result.succeeded) {
+      const complaintId = `CPL${Date.now().toString().slice(-6)}`;
+      toast.success(`Complaint submitted successfully! Reference ID: ${complaintId}`, {
+        description: 'You will receive updates via Email and SMS.',
+      });
+      form.reset();
+    } else {
+      toast.error('Submission failed', {
+        description: result.message || 'Something went wrong.',
+      });
+    }
+  } catch (error) {
+    console.error('Submission Error:', error);
+    toast.error('Network error occurred');
+  } finally {
     setIsSubmitting(false);
-  };
+  }
+};
+
 
   return (
     <motion.div
@@ -104,7 +172,7 @@ export function ComplaintForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="fullName"
+                  name="Full_Name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Full Name *</FormLabel>
@@ -118,7 +186,7 @@ export function ComplaintForm() {
                 
                 <FormField
                   control={form.control}
-                  name="contact"
+                  name="Contact_Number"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Contact Number *</FormLabel>
@@ -134,7 +202,7 @@ export function ComplaintForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="Email_Address"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email Address *</FormLabel>
@@ -148,7 +216,7 @@ export function ComplaintForm() {
                 
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="Category"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category *</FormLabel>
@@ -174,7 +242,7 @@ export function ComplaintForm() {
 
               <FormField
                 control={form.control}
-                name="address"
+                name="Address"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Address *</FormLabel>
@@ -193,7 +261,7 @@ export function ComplaintForm() {
               {/* Complaint Information */}
               <FormField
                 control={form.control}
-                name="title"
+                name="Complaint_Title"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Complaint Title *</FormLabel>
@@ -207,7 +275,7 @@ export function ComplaintForm() {
 
               <FormField
                 control={form.control}
-                name="location"
+                name="Incident_Location"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Incident Location *</FormLabel>
@@ -221,7 +289,7 @@ export function ComplaintForm() {
 
               <FormField
                 control={form.control}
-                name="description"
+                name="Detailed_Description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Detailed Description *</FormLabel>
@@ -267,3 +335,5 @@ export function ComplaintForm() {
     </motion.div>
   );
 }
+
+export default ComplaintForm;
